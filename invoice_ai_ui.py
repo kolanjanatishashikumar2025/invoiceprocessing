@@ -28,8 +28,11 @@ if uploaded_file:
     with st.spinner("Extracting fields with Donut model..."):
         try:
             # Load processor and model
-            processor = DonutProcessor.from_pretrained("naver-clova-ix/donut-base")
-            model = VisionEncoderDecoderModel.from_pretrained("naver-clova-ix/donut-base")
+           # processor = DonutProcessor.from_pretrained("naver-clova-ix/donut-base")
+           # model = VisionEncoderDecoderModel.from_pretrained("naver-clova-ix/donut-base")
+
+            processor = DonutProcessor.from_pretrained("naver-clova-ix/donut-base-finetuned-docvqa")
+            model = VisionEncoderDecoderModel.from_pretrained("naver-clova-ix/donut-base-finetuned-docvqa")
 
             device = "cuda" if torch.cuda.is_available() else "cpu"
             model.to(device)
