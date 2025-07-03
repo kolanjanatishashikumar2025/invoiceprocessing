@@ -39,7 +39,7 @@ if uploaded_file:
 
             # Prepare image
             pixel_values = processor(image.convert("RGB"), return_tensors="pt").pixel_values.to(device)
-            prompt = "<s><s_question>Extract invoice fields:<s_answer>"
+            prompt = "<s_docvqa><s_question>Extract invoice fields:<s_answer>"
             decoder_input_ids = processor.tokenizer(prompt, add_special_tokens=False, return_tensors="pt").input_ids.to(device)
 
             outputs = model.generate(pixel_values, decoder_input_ids=decoder_input_ids, max_length=512)
