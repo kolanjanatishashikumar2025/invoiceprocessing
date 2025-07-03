@@ -3,7 +3,8 @@ from PIL import Image
 from transformers import DonutProcessor, VisionEncoderDecoderModel
 import torch
 import tempfile
-import pdf2image
+#import pdf2image
+import fitz # PyMuPDF
 
 st.set_page_config(page_title="Invoice Field Extractor with Donut", layout="centered")
 st.title("📄 Invoice Field Extractor (AI-powered)")
@@ -18,8 +19,14 @@ if uploaded_file:
         pdf_path = tmp_pdf.name
 
     # Convert first page of PDF to image
-    images = pdf2image.convert_from_path(pdf_path, dpi=200)
-    image = images[0]  # Take only first page
+   # images = pdf2image.convert_from_path(pdf_path, dpi=200)
+   # image = images[0]  # Take only first page
+
+    # Open PDF and render page as image
+doc = fitz.open(pdf_path)
+page = doc.load_page(0)  # First page
+pix = page.get_pixmap(dpi=200)
+image = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
 
     st.image(image, caption="Invoice Preview", use_column_width=True)
 
