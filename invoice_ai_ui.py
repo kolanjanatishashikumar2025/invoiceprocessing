@@ -23,27 +23,31 @@ if uploaded_file:
     pix = page.get_pixmap(dpi=200)
     image = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
 
-    st.image(image, caption="Invoice Preview", use_column_width=True)
+    st.image(image, caption="Invoice Preview", use_container_width=True)
 
     with st.spinner("Extracting fields with Donut model..."):
-        # Load processor and model
-        processor = DonutProcessor.from_pretrained("naver-clova-ix/donut-base-finetuned-docvqa")
-        model = VisionEncoderDecoderModel.from_pretrained("naver-clova-ix/donut-base-finetuned-docvqa")
+        try:
+            # Load processor and model
+            processor = DonutProcessor.from_pretrained("naver-clova-ix/donut-base")
+            model = VisionEncoderDecoderModel.from_pretrained("naver-clova-ix/donut-base")
 
-        device = "cuda" if torch.cuda.is_available() else "cpu"
-        model.to(device)
+            device = "cuda" if torch.cuda.is_available() else "cpu"
+            model.to(device)
 
-        # Prepare image
-        pixel_values = processor(image.convert("RGB"), return_tensors="pt").pixel_values.to(device)
-        prompt = "<s_docvqa><s_question>Extract invoice fields:<s_answer>"
-        decoder_input_ids = processor.tokenizer(prompt, add_special_tokens=False, return_tensors="pt").input_ids.to(device)
+            # Prepare image
+            pixel_values = processor(image.convert("RGB"), return_tensors="pt").pixel_values.to(device)
+            prompt = "<s><s_question>Extract invoice fields:<s_answer>"
+            decoder_input_ids = processor.tokenizer(prompt, add_special_tokens=False, return_tensors="pt").input_ids.to(device)
 
-        outputs = model.generate(pixel_values, decoder_input_ids=decoder_input_ids, max_length=512)
-        result = processor.batch_decode(outputs, skip_special_tokens=True)[0]
+            outputs = model.generate(pixel_values, decoder_input_ids=decoder_input_ids, max_length=512)
+            result = processor.batch_decode(outputs, skip_special_tokens=True)[0]
 
-        st.markdown("### 🧾 Extracted Fields:")
-        st.json(result)
+            st.markdown("### 🧾 Extracted Fields:")
+            st.json(result)
 
-        st.success("Done!")
+            st.success("Done!")
+
+        except Exception as e:
+            st.error(f"❌ Failed to extract fields: {e}")
 else:
     st.info("Upload a PDF invoice to begin.")
