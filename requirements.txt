@@ -1,6 +1,5 @@
 streamlit
 transformers
 torch
-pdf2image
 Pillow
-
+PyMuPDF
